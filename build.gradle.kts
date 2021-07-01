@@ -25,7 +25,7 @@ sourceSets {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.google.devtools.ksp:symbol-processing-api:1.5.20-1.0.0-beta04")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.2")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.2")
