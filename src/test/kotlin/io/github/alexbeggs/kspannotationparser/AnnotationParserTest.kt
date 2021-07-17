@@ -30,6 +30,11 @@ class AnnotationParserTest {
             assertThat(annotation.stringValue).isEqualTo("emptystring")
             assertThat(annotation.kClassValue).isEqualTo(ParametersTestAnnotation::class)
             assertThat(annotation.enumValue).isEqualTo(TestEnum.NONE)
+            assertThat(annotation.annotationValue.byteValue).isEqualTo(-2)
+            assertThat(annotation.annotationValue.doubleValue).isEqualTo(-3.0)
+            assertThat(annotation.annotationValue.floatValue).isEqualTo(-4.0f)
+            assertThat(annotation.annotationValue.intValue).isEqualTo(-5)
+            assertThat(annotation.annotationValue.longValue).isEqualTo(-6L)
         }
     }
 
@@ -145,6 +150,21 @@ class AnnotationParserTest {
         }
     }
 
+    @ParametersTestAnnotation(annotationValue = ParametersTestWithNegativeDefaultsAnnotation(
+        5, 12.4,0.1f, 9, 3L
+    ), kClassValue = ParametersTestAnnotation::class)
+    @Test
+    fun testAnnotationValue() {
+        setupProcessor("testAnnotationValue", ParametersTestAnnotation::class) { annotation ->
+            assertThat(annotation.annotationValue.byteValue).isEqualTo(5)
+            assertThat(annotation.annotationValue.doubleValue).isEqualTo(12.4)
+            assertThat(annotation.annotationValue.floatValue).isEqualTo(0.1f)
+            assertThat(annotation.annotationValue.intValue).isEqualTo(9)
+            assertThat(annotation.annotationValue.longValue).isEqualTo(3L)
+
+        }
+    }
+
     @ParameterArraysTestAnnotation
     @Test
     fun testDefaultArrayValues() {
@@ -159,6 +179,7 @@ class AnnotationParserTest {
             assertThat(annotation.stringArrayValue).isEmpty()
             assertThat(annotation.kClassArrayValue).isEmpty()
             assertThat(annotation.enumArrayValue).isEmpty()
+            assertThat(annotation.annotationArrayValue).isEmpty()
         }
     }
 
@@ -258,6 +279,31 @@ class AnnotationParserTest {
         }
     }
 
+    @ParameterArraysTestAnnotation(
+        annotationArrayValue = [
+            ParametersTestWithNegativeDefaultsAnnotation(10, 41230.123, 3.2f, 1001, 2L),
+            ParametersTestWithNegativeDefaultsAnnotation(4, 123.123, 1.2f, 41, 5L)
+        ],
+    )
+    @Test
+    fun testAnnotationArrayValue() {
+        setupProcessor("testAnnotationArrayValue", ParameterArraysTestAnnotation::class) { annotation ->
+            assertThat(annotation.annotationArrayValue[0].byteValue).isEqualTo(10)
+            assertThat(annotation.annotationArrayValue[0].doubleValue).isEqualTo(41230.123)
+            assertThat(annotation.annotationArrayValue[0].floatValue).isEqualTo(3.2f)
+            assertThat(annotation.annotationArrayValue[0].intValue).isEqualTo(1001)
+            assertThat(annotation.annotationArrayValue[0].longValue).isEqualTo(2L)
+
+            assertThat(annotation.annotationArrayValue[1].byteValue).isEqualTo(4)
+            assertThat(annotation.annotationArrayValue[1].doubleValue).isEqualTo(123.123)
+            assertThat(annotation.annotationArrayValue[1].floatValue).isEqualTo(1.2f)
+            assertThat(annotation.annotationArrayValue[1].intValue).isEqualTo(41)
+            assertThat(annotation.annotationArrayValue[1].longValue).isEqualTo(5L)
+
+            assertThat(annotation.annotationArrayValue).hasLength(2)
+        }
+    }
+
     // ************************************************************
     //                      Java Annotations
     // ************************************************************
@@ -318,7 +364,7 @@ class AnnotationParserTest {
                                 resolver.getSymbolsWithAnnotation(annotationKClass.qualifiedName!!)
                                     .filter { s -> s.toString() == methodName }
                                     .map { it.annotations.first() }
-                                    .map { it.getAnnotation(annotationKClass) }
+                                    .map { it.toAnnotation(annotationKClass) }
                                     .first()
                             processor.invoke(annotation)
                             return emptyList()
@@ -357,6 +403,7 @@ annotation class ParametersTestAnnotation(
     // the declaration. Throws an NPE with using a default value
     val kClassValue: KClass<*> = ParametersTestAnnotation::class,
     val enumValue: TestEnum = TestEnum.NONE,
+    val annotationValue: ParametersTestWithNegativeDefaultsAnnotation = ParametersTestWithNegativeDefaultsAnnotation(),
 )
 
 @Suppress("LongParameterList")
@@ -371,6 +418,7 @@ annotation class ParameterArraysTestAnnotation(
     val stringArrayValue: Array<String> = emptyArray(),
     val kClassArrayValue: Array<KClass<*>> = emptyArray(),
     val enumArrayValue: Array<TestEnum> = emptyArray(),
+    val annotationArrayValue: Array<ParametersTestWithNegativeDefaultsAnnotation> = emptyArray(),
 )
 
 annotation class ParametersTestWithNegativeDefaultsAnnotation(
