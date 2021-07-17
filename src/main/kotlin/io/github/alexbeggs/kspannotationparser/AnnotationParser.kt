@@ -10,11 +10,10 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import kotlin.reflect.KClass
 
-/** TODO **/
-
 fun <T : Annotation> KSAnnotated.getAnnotation(annotationKClass: KClass<T>): T? {
-    return this.annotations.firstOrNull { annotationKClass.qualifiedName == it.annotationType.resolve().declaration.qualifiedName?.asString() }
-        ?.toAnnotation(annotationKClass)
+    return this.annotations.firstOrNull {
+        annotationKClass.qualifiedName == it.annotationType.resolve().declaration.qualifiedName?.asString()
+    }?.toAnnotation(annotationKClass)
 }
 
 /**
@@ -34,19 +33,11 @@ internal fun <T : Annotation> KSAnnotation.toAnnotation(annotationKClass: KClass
     return Proxy.newProxyInstance(clazz.classLoader, arrayOf(clazz), createInvocationHandler(clazz)) as T
 }
 
-val lruCacheMap = object : LinkedHashMap<Any, Proxy>() {
-    val MAX = 10
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Any, Proxy>?): Boolean {
-        return size > MAX;
-    }
-}
-
 @Suppress("TooGenericExceptionCaught")
 private fun KSAnnotation.createInvocationHandler(clazz: Class<*>): InvocationHandler {
     val cache = mutableMapOf<Any, Any>()
     return InvocationHandler { _, method, _ ->
         if (method.name == "toString" && arguments.none { it.name?.asString() == "toString" }) {
-            // toStringProvider()
             "${clazz.canonicalName}@${Integer.toHexString(arguments.hashCode())}"
         } else {
             val argument = try {
@@ -56,7 +47,6 @@ private fun KSAnnotation.createInvocationHandler(clazz: Class<*>): InvocationHan
             }
             when (val result = argument.value ?: method.defaultValue) {
                 is Proxy -> result
-                // TODO verify this works w/ list of annotations
                 is ArrayList<*> -> {
                     val defaultValue = { result.asArray(method) }
                     cache.getOrPut(result, defaultValue)
@@ -91,9 +81,6 @@ private fun KSAnnotation.createInvocationHandler(clazz: Class<*>): InvocationHan
 private fun KSAnnotation.asAnnotation(
     annotationInterface: Class<*>
 ): Any {
-    // return lruCacheMap.getOrPut(this) {
-
-    // }
     return Proxy.newProxyInstance(
         this.javaClass.classLoader, arrayOf(annotationInterface),
         this.createInvocationHandler(annotationInterface)
@@ -126,35 +113,28 @@ private fun ArrayList<*>.asArray(method: Method) =
         else -> { // arrays of enums or annotations
             when {
                 method.returnType.componentType.isEnum -> {
-                    val array: Array<Any> = java.lang.reflect.Array.newInstance(
-                        method.returnType.componentType,
-                        this.size
-                    ) as Array<Any>
-                    for (r in 0 until this.size) {
-                        array[r] = method.returnType.componentType.valueOf(this[r].toString())
-                    }
-                    array
+                    this.toArray(method) { result -> method.returnType.componentType.valueOf(result.toString()) }
                 }
                 method.returnType.componentType.isAnnotation -> {
-                    val array: Array<Any> = java.lang.reflect.Array.newInstance(
-                        method.returnType.componentType,
-                        this.size
-                    ) as Array<Any>
-                    for (r in 0 until this.size) {
-                        val ksAnnotation = this[r] as KSAnnotation
-                        val j = ksAnnotation.asAnnotation(method.returnType.componentType)
-                        array[r] = j
+                    this.toArray(method) { result ->
+                        (result as KSAnnotation).asAnnotation(method.returnType.componentType)
                     }
-                    array
                 }
-                else -> {
-                    throw IllegalStateException(
-                        "Unable to process type ${method.returnType.componentType.name}"
-                    )
-                }
+                else -> throw IllegalStateException("Unable to process type ${method.returnType.componentType.name}")
             }
         }
     }
+
+private fun ArrayList<*>.toArray(method: Method, valueProvider: (Any) -> Any): Array<Any> {
+    val array: Array<Any> = java.lang.reflect.Array.newInstance(
+        method.returnType.componentType,
+        this.size
+    ) as Array<Any>
+    for (r in 0 until this.size) {
+        array[r] = valueProvider.invoke(this[r])
+    }
+    return array
+}
 
 private fun <T> Class<T>.valueOf(value: String): T {
     if (this.isEnum) {
