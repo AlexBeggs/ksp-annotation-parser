@@ -2,7 +2,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     java
-    kotlin("jvm") version "1.5.20"
+    kotlin("jvm") version "1.5.21"
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
     jacoco
     pmd
@@ -24,7 +24,7 @@ sourceSets {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.5.20-1.0.0-beta04")
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.5.21-1.0.0-beta05")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.2")
