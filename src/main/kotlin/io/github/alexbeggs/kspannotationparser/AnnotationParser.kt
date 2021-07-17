@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSType
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
 fun <T : Annotation> KSAnnotated.getAnnotation(annotationKClass: KClass<T>): T? {
@@ -23,10 +24,6 @@ fun KSAnnotated.getAnnotations(): Sequence<Annotation> {
     return this.annotations.map { it.toAnnotation(Annotation::class) }
 }
 
-fun KSAnnotated.getDirectAnnotations(): Sequence<Annotation> {
-    return this.annotations.map { it.toAnnotation(Annotation::class) }
-}
-
 internal fun <T : Annotation> KSAnnotation.toAnnotation(annotationKClass: KClass<T>): T {
     val clazz = annotationKClass.java
     @Suppress("UNCHECKED_CAST")
@@ -35,7 +32,7 @@ internal fun <T : Annotation> KSAnnotation.toAnnotation(annotationKClass: KClass
 
 @Suppress("TooGenericExceptionCaught")
 private fun KSAnnotation.createInvocationHandler(clazz: Class<*>): InvocationHandler {
-    val cache = mutableMapOf<Any, Any>()
+    val cache = ConcurrentHashMap<Any, Any>(arguments.size)
     return InvocationHandler { _, method, _ ->
         if (method.name == "toString" && arguments.none { it.name?.asString() == "toString" }) {
             "${clazz.canonicalName}@${Integer.toHexString(arguments.hashCode())}"
