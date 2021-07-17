@@ -90,8 +90,7 @@ private fun <T> Any.asEnum(returnType: Class<T>): T =
 
 private fun Any.asByte(): Byte = if (this is Int) this.toByte() else this as Byte
 
-private fun Any.asClass() =
-    Class.forName((this as KSType).declaration.qualifiedName!!.asString())
+private fun Any.asClass() = Class.forName((this as KSType).declaration.qualifiedName!!.asString())
 
 @Suppress("UNCHECKED_CAST")
 private fun ArrayList<*>.asArray(method: Method) =
@@ -110,7 +109,7 @@ private fun ArrayList<*>.asArray(method: Method) =
         else -> { // arrays of enums or annotations
             when {
                 method.returnType.componentType.isEnum -> {
-                    this.toArray(method) { result -> method.returnType.componentType.valueOf(result.toString()) }
+                    this.toArray(method) { result -> result.asEnum(method.returnType.componentType) }
                 }
                 method.returnType.componentType.isAnnotation -> {
                     this.toArray(method) { result ->
@@ -131,14 +130,4 @@ private fun ArrayList<*>.toArray(method: Method, valueProvider: (Any) -> Any): A
         array[r] = valueProvider.invoke(this[r])
     }
     return array
-}
-
-private fun <T> Class<T>.valueOf(value: String): T {
-    if (this.isEnum) {
-        val valueOfMethod = this.getDeclaredMethod("valueOf", String::class.java)
-        @Suppress("UNCHECKED_CAST")
-        return valueOfMethod.invoke(null, value) as T
-    } else {
-        throw IllegalArgumentException("$this is not an Enum type")
-    }
 }

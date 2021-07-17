@@ -150,9 +150,12 @@ class AnnotationParserTest {
         }
     }
 
-    @ParametersTestAnnotation(annotationValue = ParametersTestWithNegativeDefaultsAnnotation(
-        5, 12.4,0.1f, 9, 3L
-    ), kClassValue = ParametersTestAnnotation::class)
+    @ParametersTestAnnotation(
+        annotationValue = ParametersTestWithNegativeDefaultsAnnotation(
+            5, 12.4, 0.1f, 9, 3L
+        ),
+        kClassValue = ParametersTestAnnotation::class
+    )
     @Test
     fun testAnnotationValue() {
         setupProcessor("testAnnotationValue", ParametersTestAnnotation::class) { annotation ->
@@ -161,7 +164,6 @@ class AnnotationParserTest {
             assertThat(annotation.annotationValue.floatValue).isEqualTo(0.1f)
             assertThat(annotation.annotationValue.intValue).isEqualTo(9)
             assertThat(annotation.annotationValue.longValue).isEqualTo(3L)
-
         }
     }
 
