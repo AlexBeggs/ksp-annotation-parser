@@ -27,7 +27,7 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:1.5.21-1.0.0-beta06")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.2")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.3")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.2")
     testImplementation("com.google.truth:truth:1.1.3")
 }
