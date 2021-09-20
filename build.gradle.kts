@@ -2,7 +2,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     java
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.31"
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
     jacoco
     pmd
