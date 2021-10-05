@@ -1,3 +1,5 @@
+(DEPRECATED - Use the KSP 1.+ release, which merges this functionality into it https://github.com/google/ksp/pull/508) 
+
 # Kotlin Compile Testing
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.alexbeggs/ksp-annotation-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.alexbeggs/ksp-annotation-parser)
 ![GitHub](https://img.shields.io/github/license/AlexBeggs/ksp-annotation-parser.svg?color=green&style=popout)
