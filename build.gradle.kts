@@ -28,7 +28,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.2")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.4")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.5")
     testImplementation("com.google.truth:truth:1.1.3")
 }
 
