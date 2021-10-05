@@ -3,7 +3,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 plugins {
     java
     kotlin("jvm") version "1.5.31"
-    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     jacoco
     pmd
     id("io.gitlab.arturbosch.detekt").version("1.17.1")
